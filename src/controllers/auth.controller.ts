@@ -65,6 +65,14 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       { expiresIn: '1d' }
     );
 
+    // Simpan sesi ke database
+    await prisma.session.create({
+      data: {
+        userId: user.id,
+        token,
+      }
+    });
+
     res.json({
       message: 'Login berhasil',
       token,
@@ -91,6 +99,24 @@ export const getProfile = async (req: any, res: Response): Promise<void> => {
 
     res.json({ user });
   } catch (error) {
+    res.status(500).json({ message: 'Terjadi kesalahan pada server' });
+  }
+};
+
+export const logout = async (req: any, res: Response): Promise<void> => {
+  try {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (token) {
+      await prisma.session.deleteMany({
+        where: { token }
+      });
+    }
+
+    res.json({ message: 'Logout berhasil' });
+  } catch (error) {
+    console.error('Logout error:', error);
     res.status(500).json({ message: 'Terjadi kesalahan pada server' });
   }
 };
