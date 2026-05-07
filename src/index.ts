@@ -1,22 +1,4 @@
-import express, { Request, Response } from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import authRoutes from './routes/auth.routes';
-import transactionRoutes from './routes/transaction.routes';
-
-dotenv.config({ quiet: true });
-
-const app = express();
-
-app.use(cors());
-app.use(express.json());
-
-app.use('/api/auth', authRoutes);
-app.use('/api/transactions', transactionRoutes);
-
-app.get('/api/health', (req: Request, res: Response) => {
-  res.json({ status: 'ok', message: 'Backend is running' });
-});
+import app from './app';
 
 const PORT = parseInt(process.env.PORT as string) || 5000;
 
