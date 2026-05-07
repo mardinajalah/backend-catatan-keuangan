@@ -1,4 +1,3 @@
-import { randomUUID } from 'crypto';
 import { db, Timestamp, timestampToIso } from '../utils/firestore';
 import { PublicUser, User } from '../types/models';
 
@@ -32,23 +31,41 @@ export const findUserById = async (id: string): Promise<User | null> => {
   return userFromDoc(doc);
 };
 
-export const createUser = async (data: {
+export const createOrUpdateUserFromFirebaseAuth = async (data: {
+  uid: string;
   name: string;
   email: string;
-  password: string;
+  authProvider?: string;
 }): Promise<User> => {
-  const id = randomUUID();
+  const currentUser = await findUserById(data.uid);
   const now = Timestamp.now();
+
+  if (currentUser) {
+    const updatedUser: User = {
+      ...currentUser,
+      uid: currentUser.uid || data.uid,
+      name: data.name || currentUser.name,
+      email: data.email || currentUser.email,
+      authProvider: data.authProvider || currentUser.authProvider || 'password',
+      updatedAt: now,
+    };
+
+    await usersCollection.doc(data.uid).set(updatedUser, { merge: true });
+
+    return updatedUser;
+  }
+
   const user: User = {
-    id,
+    id: data.uid,
+    uid: data.uid,
     name: data.name,
     email: data.email,
-    password: data.password,
+    authProvider: data.authProvider || 'password',
     createdAt: now,
     updatedAt: now,
   };
 
-  await usersCollection.doc(id).set(user);
+  await usersCollection.doc(data.uid).set(user);
 
   return user;
 };

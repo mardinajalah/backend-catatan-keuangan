@@ -16,27 +16,31 @@ export const toTransactionResponse = (transaction: Transaction): TransactionResp
   id: transaction.id,
   userId: transaction.userId,
   type: transaction.type,
+  title: transaction.title || transaction.description || '',
+  category: transaction.category || 'Lainnya',
+  note: transaction.note || '',
   amount: transaction.amount,
-  description: transaction.description,
+  description: transaction.title || transaction.description || '',
   date: timestampToIso(transaction.date),
   createdAt: timestampToIso(transaction.createdAt),
   updatedAt: timestampToIso(transaction.updatedAt),
 });
 
 export const findTransactionsByUserId = async (userId: string): Promise<Transaction[]> => {
-  const snapshot = await transactionsCollection
-    .where('userId', '==', userId)
-    .orderBy('date', 'desc')
-    .get();
+  const snapshot = await transactionsCollection.where('userId', '==', userId).get();
 
-  return snapshot.docs.map((doc) => doc.data() as Transaction);
+  return snapshot.docs
+    .map((doc) => doc.data() as Transaction)
+    .sort((a, b) => b.date.toMillis() - a.date.toMillis());
 };
 
 export const createTransaction = async (data: {
   userId: string;
   type: TransactionType;
   amount: number;
-  description: string;
+  title: string;
+  category: string;
+  note: string;
   date: Date;
 }): Promise<Transaction> => {
   const id = randomUUID();
@@ -46,7 +50,10 @@ export const createTransaction = async (data: {
     userId: data.userId,
     type: data.type,
     amount: data.amount,
-    description: data.description,
+    title: data.title,
+    category: data.category,
+    note: data.note,
+    description: data.title,
     date: Timestamp.fromDate(data.date),
     createdAt: now,
     updatedAt: now,
@@ -73,7 +80,7 @@ export const findTransactionByIdAndUserId = async (
 
 export const updateTransaction = async (
   id: string,
-  data: Partial<Pick<Transaction, 'type' | 'amount' | 'description' | 'date'>>
+  data: Partial<Pick<Transaction, 'type' | 'amount' | 'title' | 'category' | 'note' | 'description' | 'date'>>
 ): Promise<Transaction | null> => {
   const docRef = transactionsCollection.doc(id);
   const currentDoc = await docRef.get();
