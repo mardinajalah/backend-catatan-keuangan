@@ -1,60 +1,50 @@
 GET http://localhost:5000/api/health
 
 ###
-POST http://localhost:5000/api/auth/register
+POST http://localhost:5000/api/auth/sync-profile
+Authorization: Bearer {{firebaseIdToken}}
 Content-Type: application/json
 
 {
-  "name": "Demo User",
-  "email": "demo@example.com",
-  "password": "password123"
-}
-
-###
-POST http://localhost:5000/api/auth/login
-Content-Type: application/json
-
-{
-  "email": "demo@example.com",
-  "password": "password123"
+  "name": "Demo User"
 }
 
 ###
 GET http://localhost:5000/api/auth/profile
-Authorization: Bearer {{token}}
+Authorization: Bearer {{firebaseIdToken}}
 
 ###
 POST http://localhost:5000/api/transactions
-Authorization: Bearer {{token}}
+Authorization: Bearer {{firebaseIdToken}}
 Content-Type: application/json
 
 {
   "type": "INCOME",
   "amount": 50000,
-  "description": "Gaji",
-  "date": "2026-05-07T00:00:00.000Z"
+  "title": "Gaji",
+  "category": "Gaji",
+  "note": "",
+  "date": "2026-05-07"
 }
 
 ###
 GET http://localhost:5000/api/transactions
-Authorization: Bearer {{token}}
+Authorization: Bearer {{firebaseIdToken}}
 
 ###
 PUT http://localhost:5000/api/transactions/{{transactionId}}
-Authorization: Bearer {{token}}
+Authorization: Bearer {{firebaseIdToken}}
 Content-Type: application/json
 
 {
   "type": "EXPENSE",
   "amount": 25000,
-  "description": "Belanja",
-  "date": "2026-05-07T00:00:00.000Z"
+  "title": "Belanja",
+  "category": "Makanan",
+  "note": "",
+  "date": "2026-05-07"
 }
 
 ###
 DELETE http://localhost:5000/api/transactions/{{transactionId}}
-Authorization: Bearer {{token}}
-
-###
-POST http://localhost:5000/api/auth/logout
-Authorization: Bearer {{token}}
+Authorization: Bearer {{firebaseIdToken}}

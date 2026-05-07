@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import { findSessionByToken, deleteSessionByToken } from '../repositories/session.repository';
+import { auth } from '../utils/firebaseAuth';
 
 export const authenticateToken = async (req: any, res: Response, next: NextFunction) => {
   const authHeader = req.headers['authorization'];
@@ -11,21 +10,16 @@ export const authenticateToken = async (req: any, res: Response, next: NextFunct
   }
 
   try {
-    const decoded: any = jwt.verify(token, process.env.JWT_SECRET as string);
-    const session = await findSessionByToken(token);
+    const decoded = await auth.verifyIdToken(token);
 
-    if (!session) {
-      return res.status(401).json({ message: 'Sesi telah berakhir atau sudah logout. Silakan login kembali.' });
-    }
-
-    if (session.expiresAt && session.expiresAt.toDate().getTime() <= Date.now()) {
-      await deleteSessionByToken(token);
-      return res.status(401).json({ message: 'Sesi telah berakhir atau sudah logout. Silakan login kembali.' });
-    }
-
-    req.user = decoded;
+    req.user = {
+      userId: decoded.uid,
+      email: decoded.email,
+      name: decoded.name,
+    };
     next();
   } catch (err) {
-    return res.status(403).json({ message: 'Token tidak valid atau sudah kadaluarsa' });
+    console.error('Firebase auth error:', err);
+    return res.status(403).json({ message: 'Firebase ID token tidak valid atau sudah kadaluarsa' });
   }
 };

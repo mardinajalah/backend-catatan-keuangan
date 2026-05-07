@@ -4,9 +4,10 @@ export type TransactionType = 'INCOME' | 'EXPENSE';
 
 export interface User {
   id: string;
+  uid: string;
   name: string;
   email: string;
-  password: string;
+  authProvider: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -18,20 +19,15 @@ export interface PublicUser {
   createdAt?: string;
 }
 
-export interface Session {
-  id: string;
-  userId: string;
-  tokenHash: string;
-  createdAt: Timestamp;
-  expiresAt: Timestamp | null;
-}
-
 export interface Transaction {
   id: string;
   userId: string;
   type: TransactionType;
+  title: string;
+  category: string;
+  note: string;
   amount: number;
-  description: string;
+  description?: string;
   date: Timestamp;
   createdAt: Timestamp;
   updatedAt: Timestamp;
@@ -41,6 +37,9 @@ export interface TransactionResponse {
   id: string;
   userId: string;
   type: TransactionType;
+  title: string;
+  category: string;
+  note: string;
   amount: number;
   description: string;
   date: string;

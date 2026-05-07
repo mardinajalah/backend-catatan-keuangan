@@ -30,10 +30,11 @@ export const getTransactions = async (req: any, res: Response): Promise<void> =>
 export const createTransaction = async (req: any, res: Response): Promise<void> => {
   try {
     const userId = req.user.userId;
-    const { type, amount, description, date } = req.body;
+    const { type, amount, title, category, note, description, date } = req.body;
+    const transactionTitle = title || description;
 
-    if (!type || amount === undefined || amount === null || !description || !date) {
-      res.status(400).json({ message: 'Semua field (type, amount, description, date) wajib diisi' });
+    if (!type || amount === undefined || amount === null || !transactionTitle || !date) {
+      res.status(400).json({ message: 'Semua field (type, amount, title, date) wajib diisi' });
       return;
     }
 
@@ -54,7 +55,9 @@ export const createTransaction = async (req: any, res: Response): Promise<void> 
       userId,
       type,
       amount: parsedAmount,
-      description,
+      title: transactionTitle,
+      category: category || 'Lainnya',
+      note: note || '',
       date: parsedDate,
     });
 
@@ -69,7 +72,7 @@ export const updateTransaction = async (req: any, res: Response): Promise<void> 
   try {
     const userId = req.user.userId;
     const { id } = req.params;
-    const { type, amount, description, date } = req.body;
+    const { type, amount, title, category, note, description, date } = req.body;
 
     const existingTransaction = await findTransactionByIdAndUserId(id, userId);
 
@@ -85,6 +88,8 @@ export const updateTransaction = async (req: any, res: Response): Promise<void> 
 
     const parsedAmount = amount !== undefined && amount !== null ? Number(amount) : existingTransaction.amount;
     const parsedDate = date ? new Date(date) : existingTransaction.date.toDate();
+    const existingTitle = existingTransaction.title || existingTransaction.description || '';
+    const nextTitle = title || description || existingTitle;
 
     if (Number.isNaN(parsedAmount) || Number.isNaN(parsedDate.getTime())) {
       res.status(400).json({ message: 'Amount atau date tidak valid' });
@@ -94,7 +99,10 @@ export const updateTransaction = async (req: any, res: Response): Promise<void> 
     const updatedTransaction = await updateTransactionRecord(id, {
       type: type || existingTransaction.type,
       amount: parsedAmount,
-      description: description || existingTransaction.description,
+      title: nextTitle,
+      category: category || existingTransaction.category || 'Lainnya',
+      note: note ?? existingTransaction.note ?? '',
+      description: nextTitle,
       date: Timestamp.fromDate(parsedDate),
     });
 
