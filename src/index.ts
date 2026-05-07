@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes';
 import transactionRoutes from './routes/transaction.routes';
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const app = express();
 

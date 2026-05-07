@@ -22,11 +22,11 @@
   },
   "homepage": "https://github.com/mardinajalah/backend-catatan-keuangan#readme",
   "dependencies": {
-    "@prisma/client": "^6.19.3",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "firebase-admin": "^13.8.0",
     "jsonwebtoken": "^9.0.3"
   },
   "devDependencies": {
@@ -36,7 +36,6 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.6.0",
     "nodemon": "^3.1.14",
-    "prisma": "^6.19.3",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.3"
   }
