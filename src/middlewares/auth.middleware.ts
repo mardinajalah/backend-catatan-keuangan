@@ -19,7 +19,10 @@ export const authenticateToken = async (req: any, res: Response, next: NextFunct
     };
     next();
   } catch (err) {
-    console.error('Firebase auth error:', err);
+    console.error('Firebase auth error:', {
+      message: err instanceof Error ? err.message : String(err),
+      hasAuthorizationHeader: Boolean(authHeader),
+    });
     return res.status(403).json({ message: 'Firebase ID token tidak valid atau sudah kadaluarsa' });
   }
 };

@@ -25,8 +25,14 @@ export const syncProfile = async (req: any, res: Response): Promise<void> => {
 
     res.json({ message: 'Profile berhasil disinkronkan', user: toPublicUser(user) });
   } catch (error) {
-    console.error('Sync profile error:', error);
-    res.status(500).json({ message: 'Terjadi kesalahan pada server' });
+    console.error('Sync profile error:', {
+      message: error instanceof Error ? error.message : String(error),
+      userId: req.user?.userId,
+      email: req.user?.email,
+    });
+    res.status(500).json({
+      message: 'Gagal sinkron profile ke backend. Periksa konfigurasi Firebase Admin di Vercel.',
+    });
   }
 };
 
@@ -42,6 +48,10 @@ export const getProfile = async (req: any, res: Response): Promise<void> => {
 
     res.json({ user: toPublicUser(user) });
   } catch (error) {
+    console.error('Get profile error:', {
+      message: error instanceof Error ? error.message : String(error),
+      userId: req.user?.userId,
+    });
     res.status(500).json({ message: 'Terjadi kesalahan pada server' });
   }
 };
