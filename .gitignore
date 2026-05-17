@@ -5,3 +5,4 @@ serviceAccount*.json
 firebase-service-account*.json
 *-firebase-adminsdk-*.json
 .vercel
+.agents
